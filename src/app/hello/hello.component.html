@@ -1,0 +1,27 @@
+<p>hello works!</p>
+
+<h3>Your name: {{ user.name }}</h3>
+<p>Your name: {{ user.age }}</p>
+
+<div *ngIf="user.age >= 13">Bạn có thể xem nội dung PG-13</div>
+<div *ngIf="user.age < 13">Bạn không thể xem nội dung PG-13</div>
+
+<div *ngFor="let author of authors">
+    {{author.id}} - {{author.firstName}} {{author.lastName}}
+</div>
+
+<app-progress-bar
+  [progress]="80"
+  [backgroundColor]="'#9e9e9e'"
+  [progressColor]="'#2e8b57'"
+>
+</app-progress-bar>
+
+<br />
+
+
+<button (click)="toggleInside()">Toggle inside class</button>
+
+<br />
+
+<app-toggle #toggleComp></app-toggle>

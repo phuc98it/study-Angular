@@ -1,0 +1,265 @@
+<custom-tag> : tương ứng với 1 component.
+
+bootstrapApplication : trỏ đến -> module.
+
+@NgModule : định nghĩa 'module' trong Angular.
+
+@Component : định nghĩa 'component' tương ứng với 1 'view' 
+    -> 1 Page có thể có nhiều component (Main Page | Header | Side Nav | Footer)
+
+@Component ({<meta-data>})
+
+- Mỗi lần 1 component được tạo ra sẽ phải được khai báo trong 'declarations' của @NgModule
+
+- Navigate Page: khai báo chúng trong 'RouteModule'
+
+- constructor : chỉ nên inject service - chứa không thực thi xử lí.
+	+) Constructor là hàm tạo của một class, nó là một function đặc biệt mà khi bạn khởi tạo một 'instance' của class thì nó sẽ được tự động chạy, và chỉ chạy duy nhất một lần.
+	
+
+- ngOnInit : sẽ thực hiện xử lí khi đối tượng được khởi tạo.
+	+) ngOninit là một life-cycle method, nó sẽ được Angular tự động gọi khi component được khởi tạo, sau cả khi constructor chạy và sau khi các input đã được binding. 
+
+=> Do đó nếu bạn binding cho một property ở template của component cha, thì ở constructor của component con bạn sẽ chưa nhận được giá trị mà bạn đã binding, nhưng ở ngOnInit thì bạn sẽ có thể nhận được.
+
+**) Trong thực tế, Angular khuyến cáo hạn chế code ở constructor, constructor làm càng ít nhiệm vụ càng tôt, hãy để ngOnInit lo tiếp phần việc còn lại.
+
+
+
+Document Object Model (DOM) : tương ứng với HTML bằng thao tác vủa Javascript.
+	+) type="text" hay value="something" là các HTML attribute.
+
+Render : show info ra màn hình.
+
+Property Binding : khi property thay đổi trong 'class component' -> cũng phải update value property đó tương ứng ở 'template'
+	=> Sử dụng dấu ngoặc vuông [ ... ] , để thể hiện điều đó.
+
+Event Binding : 'class component' lắng nghe các action 'event' từ 'template'
+	=> Sử dụng dấu ngoặc tròn ( ... ) , để thể hiện hành vi đó.
+
+== TWO-WAY BINDING ==
+	Trong thực tế two-way binding chính là kết hợp của:
+		+) binding dữ liệu từ class ra template thông qua property binding,	[]
+		+) từ template vào class thông qua event binding.			()
+	
+	*) Cần "Imports FormsModule" : để sử dụng 'ngModel' -> [(ngModel)]
+	
+
+HttpClientModule : để call APIs -> return 'stream data'
+	+) 'HttpClient'- fetch APIs and transform data return.
+
+
+<div class="shipping-item" *ngFor="let shipping of shippingCosts | async">
+The async pipe returns the latest value from a stream of data and continues to do so for the life of a given component.
+	+) When Angular destroys that component, the async pipe automatically stops. For detailed information about the async pipe.
+
+
+
+
+== STRUCTURE DIRECTIVE ==
+syntax : *ngIf="<expression>"
+	( dấu * tương đương với [ ... ] - property binding )
+
+ex:	<div *ngIf="user.age >= 13; else noPG13">Bạn có thể xem nội dung PG-13</div>
+	<ng-template #noPG13>
+	  <div>Bạn không thể xem nội dung PG-13</div>
+	</ng-template>
+
+	+) Tag template : lưu trữ 1 Template được định nghĩa bên trong cặp thẻ mở/đóng.
+		-> <ng-template #<tag> >	=> để render ra màn hình.
+
+
+
+syntax : *ngFor="let item of items"
+	(hoặc có thể viết theo kiểu property binding - [ngFor])
+
+
+=> Lồng nhau: If trong For.
+<div *ngFor="”let" item of list”>
+  <div *ngIf="”somethingGoood”">More code</div>		// ở đây thấy sử dụng thêm <div>
+</div>
+
+	-> Trong TH không đc thêm 1 thẻ div -> thì sử dụng ng-template để convert
+
+<div *ngFor="”let" item of list”>
+  <ng-container *ngIf="”somethingGoood”"> More code </ng-container>
+</div>
+<div *ngFor="”let" item of list”>
+  <ng-template [ngIf]="”somethingGoood”"> More code </ng-template>
+</div>
+
+
+
+== ATTRIBUTE DIRECTIVE ==
+
+*) STYLE BINDING : dùng khi muốn 'binding style' trong template.
+syntax: <div [style]=”styleExpr” >	(styleExpr : 1 trong các kiểu String | Array String | Object.)
+	+) String	: "width: 100%; height: 100%"
+	+) Array String	: ['width', '100px']
+	+) Object	: {[key: string]: string | undefined | null} như {width: '100px', height: '100px'}
+
+*) CLASS BINDING : ???
+
+*) Tương tác giữa 'Parent' vs 'Children'
+	+) Binding Data từ Parent -> Children	= @Input()
+	+) Listen Event từ Children -> Parent	= @Output() và 'EventEmitter'
+
+@Input <property>	: binding giá trị từ Parent componet -> Child component.
+ngOnChanges		: áp dụng trong trường hợp binding giá trị bị thay đổi của property.
+			-> Hay được sử dụng để 'Validate propery' mỗi lần thay đổi.
+
+ngOnChanges(changes: SimpleChanges) {
+    if ('progress' in changes) {
+      if (typeof changes['progress'].currentValue !== 'number') {
+        const progress = Number(changes['progress'].currentValue);
+        if (Number.isNaN(progress)) {
+          this.progress = 0;
+        } else {
+          this.progress = progress;
+        }
+      }
+    }
+  }
+
+
+== Custom Two-way Binding ==
+
+*) Sử dụng ngModel và ngModelChange , kết hợp @Input và @Output
+
+
+
+== Template Variable ==
+vi du: 
+<button (click)="toggleComp.toggle()">Toggle</button>		(2)
+
+<br />
+
+<app-toggle #toggleComp></app-toggle>				(1)
+
+- Khi này phải khai báo tag component trước - sau đó set 'template variable' = #
+	(bước (1))
+
+- Sử dụng khi thấy ở bước (2)		=> cách này xảy ra 1 vấn đề là xử lí "logic ở template".
+
+=> Điều này dẫn đến không phải, khai báo thêm hay truyền 1 phần tử từ template về component 'parent'. 
+
+** Nhưng xử lí 'template variable' chỉ ở ngoài template thì ko hay (logic nên đưa vào trong component).
+=> Dùng @ViewChild('<template variable>') để xử lí việc này. 
+	+) Những vấn đề liên quan đến logic đều quy về component ts để xử lí. (** Lưu Ý **)
+
+
+
+== Content Projection ==	ng-content
+- Ứng dụng khi layout chung template, nhưng khác title.
+- sử dụng: đặt 'ng-content' vô trong template của component.
+	+) Khai báo những content khác nhau đặt trong thẻ.
+
+Ví dụ: 
+- toggle.component.html
+	<div class="toogle-label">
+	  <ng-content></ng-content>
+	</div>
+
+- app.component.html
+	<app-toggle [(checked)]="questions.question1">
+	  <span>Question 1</span>		-> content 1 : được truyền vào 'ng-content' của template 'app-toggle'
+	</app-toggle>
+
+	<app-toggle [(checked)]="questions.question2">
+	  <span>Question 2</span>		-> content 2 : được truyền vào 'ng-content' của template 'app-toggle'
+	</app-toggle>
+
+
+== Các dạng Selector ==
+Các dạng của selector có thể bao gồm:
+
+	Tag selector: <ng-content select="some-component-selector-or-html-tag"></ng-content>
+	CSS Class selector: <ng-content select=".some-class"></ng-content>
+	Attribute selector: <ng-content select="[some-attr]"></ng-content>
+	Combine nhiều selectors: <ng-content select="some-component-selector-or-html-tag[some-attr]"></ng-content>
+
+
+*) Lưu ý: "vị trí item" khi sử dụng với ng-content
+
+
+== ng-template vs ngTemplateOutlet ==
+- ng-template : phần HTML đó sẽ không dc render lên UI ngay lập tức.
+	+) định nghĩa template riêng lẻ.
+
+- ngTemplateOutlet : để render một template được tạo ra bởi ng-template lên UI.
+	+) cách dùng : *ngTemplateOutlet
+
+- ng-container : custom html tag để khi render trên UI
+
+*) component có @Input() để truyền data từ bên ngoài vào, thì ng-template cũng có cú pháp tương tự để truyền data.
+	=> Đó chính là "ngTemplateOutletContext"
+
+*) 1 số TH ứng dụng:
+	1. Dùng kết hợp với các Structure Directive của Angular, ví dụ như *ngIf
+	2. Một số UI element trong một component bị lặp lại trong chính component đó,
+		 nhưng phần code đó quá nhỏ để tách ra làm một component riêng.
+	3. Dùng ng-template để pass vào component khác. Hỗ trợ override template có sẵn trong component.
+
+
+
+
+
+
+
+
+================ Router ===============
+- import/export 'RouterModule' từ  '@angular/router';
+	+) forRoot([..routes..]) : để cấu hình 'routes'.
+	+) forChild() : sử dụng gọi trong các module khác -> để config 'routes'.
+	
+*) Lưu ý :
+	- "forRoot()" chỉ gọi một lần duy nhất để đảm bảo rằng các service của RouterModule được khởi tạo và chỉ có một instance duy nhất,
+		nếu cố gọi nhiều lần sẽ dẫn tới không kiểm soát đc 'behavior' thực thi theo routes nào.
+		
+	- "forChild()" sử dụng khi config trong các module con khác.
+	
+	- <router-outlet> : là nơi phần 'component' được load ra tương ứng.
+	
+	- Thứ tự  khi config 'route' : route nào càng chi tiết thì đặt lên trước, ít thì cho xuống cuối 	- setup .forRoot([..routes..])
+	
+	
+- Routing Module : tách riêng phần Routing ra thành 1 module.	(ví dụ: AppRoutingModule)
+
+- Child Routes : gom phần prefix path chung, và config các child-path detail hơn.	(như ở  'ArticleModule')
+
+- ActivatedRoute : để lấy thông tin :params ở '/path'.
+	+) this.activatedRoute.snapshot.paramMap.get('slug');
+	
+- Navigate (Router Service) : 'redirect' được gọi hay chỉ định từ 'component' - khi 1 action nào đó xảy ra.
+	
+	
+
+	
+=== Lazy Module ===
+
+- Giải quyết bài toán 'Reload Module':
+	+) Khi chỉ reload 1 module, nhưng cả hệ thống đều reload theo -> các module khác cũng phải reload.
+
+- Khai báo: trong config 'Routes'
+	+) Thay thế 'component'  - sử dụng loadChildren : () => import('./admin/admin.module').then((m) => m.AdminModule)
+		=> Tức 1 function có return lại một "dynamic import module".
+		
+*) Lazy load chính là như thế, tức là không load ngay từ đầu, mà chỉ load khi cần đến.
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+
